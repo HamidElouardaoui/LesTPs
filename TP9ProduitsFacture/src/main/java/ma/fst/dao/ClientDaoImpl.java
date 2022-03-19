@@ -1,0 +1,67 @@
+package ma.fst.dao;
+
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
+
+import ma.fst.models.Client;
+import ma.fst.models.Facture;
+
+public class ClientDaoImpl implements  IClientDao{
+	
+	EntityManagerFactory emf = Persistence.createEntityManagerFactory("unit_clients");
+	EntityManager em = emf.createEntityManager();
+	
+    @Override
+    public boolean save(Client c) {
+    	em.getTransaction().begin();
+    	em.persist(c);
+    	em.getTransaction().commit();
+    	return true;
+    }
+
+	@Override
+	public Client update(Client c) {
+		em.getTransaction().begin();
+		Client currentClient =
+		em.find(Client.class,c.getId_client());
+		currentClient.setNom(c.getNom());
+		currentClient.setPrenom(c.getPrenom());
+		currentClient.setAdresse(c.getAdresse());
+		em.persist(currentClient);
+		em.getTransaction().commit();
+		return c;
+	}
+
+	@Override
+	public boolean deleteById(long idClient) {
+		em.getTransaction().begin();
+		Client clientInDataBase = em.find(Client.class , idClient);
+		if(clientInDataBase!=null) em.remove(clientInDataBase);
+		em.getTransaction().commit();
+		return true;
+	}
+
+	@Override
+	public Client findById(long idClient) {
+		return em.find(Client.class , idClient);
+	}
+
+	@Override
+	public List<Client> findAll() {
+		Query query = em.createNamedQuery("Client.findAll");
+		List<Client> clients = query.getResultList();
+		return clients;
+	}
+	
+	@Override
+    public boolean saveFacture(Facture f) {
+    	em.getTransaction().begin();
+    	em.persist(f);
+    	em.getTransaction().commit();
+    	return true;
+    }
+}
